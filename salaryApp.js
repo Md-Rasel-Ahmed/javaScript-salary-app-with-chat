@@ -22,7 +22,6 @@ const getChartItems = function (data) {
   for (const i in data) {
     chartItems.push(data[i]);
   }
-
   return chartItems;
 };
 
@@ -80,20 +79,32 @@ const initialCountListener = function () {
 };
 
 function addRecordHandler() {
-  const name = document.getElementById("name").value;
-  const salary = document.getElementById("salary").value;
-
+  let name = document.getElementById("name").value;
+  let salary = document.getElementById("salary").value;
   if (!name || !salary) {
-    showDataError(name, salary);
+    // showDataError(name, salary);
+    alert("");
     return;
   }
 
-  addRecord(name, !salary);
+  addRecord(name, salary);
+}
+
+// randome text generator
+function makeid(length) {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 function addRecord(name, salary) {
   const newItem = getRecord(name, salary);
-  const id = Math.ceil(Math.random() * 1000000000);
+  const id = makeid(15);
 
   salary_data[id] = newItem;
   initializeChart(salary_data);
@@ -104,7 +115,13 @@ function getRecord(name, salary) {
     name: name,
     salary: salary,
   };
-
+  // localStorage get and set items
+  if (localStorage.getItem("records") == null) {
+    localStorage.setItem("records", "[]");
+  }
+  let getData = JSON.parse(localStorage.getItem("records"));
+  getData.push(newItem);
+  localStorage.setItem("records", JSON.stringify(getData));
   return newItem;
 }
 
@@ -115,9 +132,9 @@ function secondHandler(e) {
 const showLastItem = function () {
   const items = salary_data;
   let lastKey;
-  for (const key in items){
+  for (const key in items) {
     lastKey = key;
-  };
+  }
   const lastItem = items[lastKey];
   const lastRecord = getRecord(lastItem.name, lastItem.salary);
   displayLastItemDialog(lastRecord);
@@ -130,37 +147,37 @@ const loadFirebaseData = function (resHandler) {
 };
 
 const displayLastItemDialog = function (lastItem) {
-  const dlg = document.getElementById("dialog-last-item");
-  dlg.classList.remove("hide");
-  document.getElementById("showName").innerText = lastItem.name;
-  document.getElementById("showSalary").innerText = d3.format(",.0f")(
+  // const dlg = document.getElementById("dialog-last-item");
+  // dlg.classList.remove("hide");
+  document.getElementById("recodedName").textContent = lastItem.name;
+  document.getElementById("recodedSalary").textContent = d3.format(",.0f")(
     lastItem.salary
   );
-  dlg.dialog({
-    buttons: {
-      Ok: function () {
-        $(this).dialog("close");
-      },
-    },
-  });
+  // dlg.dialog({
+  //   buttons: {
+  //     Ok: function () {
+  //       $(this).dialog("close");
+  //     },
+  //   },
+  // });
 };
 
-var showDataError = function (name, salary) {
-  const dlg = document.getElementById("#dialog-error");
-  dlg.classList.remove("hide");
+// var showDataError = function (name, salary) {
+//   const dlg = document.getElementById("#dialog-error");
+//   dlg.classList.remove("hide");
 
-  toggleErrorMessage("#newName", name, "Who the hell you are talking about!");
-  toggleErrorMessage("#newSalary", salary, "How much that guy make!");
+//   toggleErrorMessage("#newName", name, "Who the hell you are talking about!");
+//   toggleErrorMessage("#newSalary", salary, "How much that guy make!");
 
-  dlg.dialog({
-    width: 600,
-    buttons: {
-      Ok: function () {
-        $(this).dialog("close");
-      },
-    },
-  });
-};
+//   dlg.dialog({
+//     width: 600,
+//     buttons: {
+//       Ok: function () {
+//         $(this).dialog("close");
+//       },
+//     },
+//   });
+// };
 
 function toggleErrorMessage(selector, value, msg) {
   if (value) {
@@ -222,15 +239,32 @@ function longLineCode() {
 */
 
 const uniquifyNames = function (items) {
-  const uniqueNames = {};
-
+  let uniqueNames = {};
   return items.map(function (item) {
-    if (uniqueNames[item.name]) {
+    if (uniqueNames[item.name] !== undefined) {
       uniqueNames[item.name] += " ";
       item.name += uniqueNames[item.name];
     } else {
       uniqueNames[item.name] = "";
     }
+
     return item;
   });
 };
+let arr = [
+  { name: "rasel", salary: 2500 },
+  { name: "nahida", salary: 2800 },
+  { name: "meheraj", salary: 3590 },
+  { name: "meheraj", salary: 3590 },
+  { name: "meheraj", salary: 2403 },
+  { name: "meheraj", salary: 8572 },
+];
+// console.log(arr[2] === arr[3]);
+// console.log(arr);
+let uniqe = arr.map((item) => item["name"]);
+let uniqueObjArray = [
+  ...new Map(
+    arr.map((item) => [item["name"] == [item["name"]], item])
+  ).values(),
+];
+console.log(uniqueObjArray);
